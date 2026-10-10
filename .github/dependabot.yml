@@ -6,6 +6,12 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 10
+    ignore:
+      # typescript-eslint (all current releases) only supports
+      # typescript ">=4.8.4 <6.1.0", so a major TypeScript bump breaks
+      # `npm ci`. Revisit once typescript-eslint supports TS 6/7.
+      - dependency-name: "typescript"
+        versions: [">=6.0.0"]
     groups:
       dev-dependencies:
         dependency-type: development
