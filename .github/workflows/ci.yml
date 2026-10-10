@@ -43,7 +43,7 @@ jobs:
         run: npm run build:firefox
 
       - name: Lint Firefox bundle
-        run: npx --yes web-ext@latest lint --source-dir dist-firefox --no-input
+        run: npx --yes web-ext@10 lint --source-dir dist-firefox --no-input
 
       - name: Upload Chrome bundle
         if: matrix.node-version == 24

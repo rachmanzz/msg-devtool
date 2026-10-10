@@ -40,7 +40,9 @@ npm run build:firefox   # output: dist-firefox/
 ```
 
 `npm run build` is an alias for `npm run build:chrome`. Each target emits the
-matching manifest from the `manifests/` directory into its output folder:
+matching manifest from the `manifests/` directory into its output folder. The
+manifest `version` is injected from `package.json` at build time, so `package.json`
+is the single source of truth for the version:
 
 ```
 dist/                       dist-firefox/

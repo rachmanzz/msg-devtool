@@ -2,25 +2,44 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const MANIFEST_DIR = resolve(import.meta.dirname, "manifests");
+const pkg = JSON.parse(
+  readFileSync(resolve(import.meta.dirname, "package.json"), "utf8"),
+) as { version: string };
 
 /**
- * Emits the correct `manifest.json` for the build target. Use
- * `vite build --mode firefox` to produce a Firefox bundle.
+ * Extension stores only accept up to four dot-separated integers, so
+ * `1.2.3-beta.1` becomes `1.2.3`.
+ */
+function toExtensionVersion(version: string): string {
+  const parts = (version.split("-")[0] ?? "")
+    .split(".")
+    .filter((part) => /^\d+$/.test(part));
+  return parts.length > 0 ? parts.slice(0, 4).join(".") : "0.0.0";
+}
+
+/**
+ * Emits the correct `manifest.json` for the build target, injecting the version
+ * from `package.json`. Use `vite build --mode firefox` for a Firefox bundle.
  */
 function manifestPlugin(target: "chrome" | "firefox", outDir: string) {
   return {
     name: "msg-devtool-manifest",
     closeBundle() {
-      const source = resolve(MANIFEST_DIR, `${target}.json`);
-      const destination = resolve(import.meta.dirname, outDir, "manifest.json");
-      if (!existsSync(destination)) {
-        mkdirSync(resolve(import.meta.dirname, outDir), { recursive: true });
-      }
-      copyFileSync(source, destination);
+      const manifest = JSON.parse(
+        readFileSync(resolve(MANIFEST_DIR, `${target}.json`), "utf8"),
+      ) as Record<string, unknown>;
+      manifest.version = toExtensionVersion(pkg.version);
+
+      const directory = resolve(import.meta.dirname, outDir);
+      mkdirSync(directory, { recursive: true });
+      writeFileSync(
+        resolve(directory, "manifest.json"),
+        `${JSON.stringify(manifest, null, 2)}\n`,
+      );
     },
   };
 }

@@ -97,7 +97,7 @@ jobs:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: |
-          npx --yes web-ext@latest sign \
+          npx --yes web-ext@10 sign \
             --source-dir dist-firefox \
             --artifacts-dir web-ext-artifacts \
             --channel listed \
