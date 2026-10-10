@@ -97,10 +97,29 @@ npm run test:watch    # Vitest watch mode
 ## Continuous Integration
 
 Every push and pull request to `main` runs **GitHub Actions**
-(`.github/workflows/ci.yml`): lint → format check → typecheck → test → build.
-The built extension is uploaded as a workflow artifact
-(`msgpack-devtools-dist`), so you can download and load it without building
-locally.
+(`.github/workflows/ci.yml`): lint → format check → typecheck → test → build,
+on a matrix of **Node 22 and 24**. The built extension is uploaded as a workflow
+artifact (`msgpack-devtools-dist`), so you can download and load it without
+building locally.
+
+### Release
+
+Pushing a version tag (e.g. `git tag v0.1.0 && git push origin v0.1.0`) runs
+`.github/workflows/release.yml`: it re-runs the full verification suite, builds
+the extension, packages `dist/` into a `.zip`, and creates a GitHub Release with
+the archive attached.
+
+If the Chrome Web Store secrets (`CWS_EXTENSION_ID`, `CWS_CLIENT_ID`,
+`CWS_CLIENT_SECRET`, `CWS_REFRESH_TOKEN`) are configured, the same workflow also
+uploads and auto-publishes the release to the Chrome Web Store. When the secrets
+are absent, the publish step is skipped.
+
+### Security
+
+- **CodeQL** (`.github/workflows/codeql.yml`) analyzes the JavaScript/TypeScript
+  sources on every push, pull request, and a weekly schedule.
+- **Dependabot** (`.github/dependabot.yml`) opens weekly grouped update PRs for
+  npm dependencies and GitHub Actions.
 
 ## Project Structure
 
@@ -125,7 +144,12 @@ msg-devtool/
 │       ├── settings.ts        # Custom Content-Type persistence
 │       ├── format.ts          # Human-readable size/duration/time
 │       └── types.ts           # Shared Capture type
-├── .github/workflows/ci.yml   # CI: lint, typecheck, test, build
+├── .github/
+│   ├── dependabot.yml         # Weekly dependency update PRs
+│   └── workflows/
+│       ├── ci.yml             # CI: lint, typecheck, test, build (matrix)
+│       ├── codeql.yml         # CodeQL security analysis
+│       └── release.yml        # Tag-triggered release + CWS publish
 ├── devtools.html              # DevTools page entry point
 ├── panel.html                 # Panel page entry point
 ├── vite.config.ts             # Multi-entry build + vitest config
