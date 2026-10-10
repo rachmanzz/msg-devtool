@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { decodeMsgpackBody, isMsgPackContentType } from "../lib/decode";
 import { filterCaptures } from "../lib/filter";
 import { loadCustomContentTypes, saveCustomContentTypes } from "../lib/settings";
+import { extensionApi, getResponseContent } from "../lib/browser";
 import type { Capture } from "../lib/types";
 
 const STORAGE_KEY = "msg-devtool.captures";
@@ -25,7 +26,7 @@ export function useCaptures() {
 
   useEffect(() => {
     let cancelled = false;
-    chrome.storage.session
+    extensionApi.storage.session
       .get(STORAGE_KEY)
       .then((stored) => {
         if (cancelled) return;
@@ -52,7 +53,7 @@ export function useCaptures() {
       nextId: idRef.current,
       selectedId,
     };
-    chrome.storage.session.set({ [STORAGE_KEY]: state }).catch(() => {});
+    extensionApi.storage.session.set({ [STORAGE_KEY]: state }).catch(() => {});
   }, [captures, selectedId]);
 
   useEffect(() => {
@@ -64,7 +65,7 @@ export function useCaptures() {
 
       if (!isMsgPackContentType(contentType, customContentTypes)) return;
 
-      request.getContent((content, encoding) => {
+      void getResponseContent(request).then(({ content, encoding }) => {
         const result = decodeMsgpackBody(content, encoding);
         const id = ++idRef.current;
         const capture: Capture = {
@@ -86,9 +87,9 @@ export function useCaptures() {
       });
     };
 
-    chrome.devtools.network.onRequestFinished.addListener(listener);
+    extensionApi.devtools.network.onRequestFinished.addListener(listener);
     return () => {
-      chrome.devtools.network.onRequestFinished.removeListener(listener);
+      extensionApi.devtools.network.onRequestFinished.removeListener(listener);
     };
   }, [customContentTypes]);
 

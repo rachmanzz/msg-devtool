@@ -1,3 +1,3 @@
-chrome.devtools.panels.create("MsgPack", "", "panel.html", () => {
-  // Panel created.
-});
+import { createDevtoolsPanel } from "./lib/browser";
+
+createDevtoolsPanel("MsgPack", "", "panel.html");

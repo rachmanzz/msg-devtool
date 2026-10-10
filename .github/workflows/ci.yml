@@ -36,12 +36,25 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Build
-        run: npm run build
+      - name: Build (Chrome)
+        run: npm run build:chrome
 
-      - name: Upload extension bundle
+      - name: Build (Firefox)
+        run: npm run build:firefox
+
+      - name: Lint Firefox bundle
+        run: npx --yes web-ext@latest lint --source-dir dist-firefox --no-input
+
+      - name: Upload Chrome bundle
         if: matrix.node-version == 24
         uses: actions/upload-artifact@v4
         with:
-          name: msgpack-devtools-dist
+          name: msgpack-devtools-chrome
           path: dist/
+
+      - name: Upload Firefox bundle
+        if: matrix.node-version == 24
+        uses: actions/upload-artifact@v4
+        with:
+          name: msgpack-devtools-firefox
+          path: dist-firefox/

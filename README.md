@@ -1,12 +1,13 @@
 # MessagePack DevTools
 
-A Chrome DevTools extension for intercepting, decoding, and inspecting **MessagePack (msgpack)** network responses.
+A Chrome and Firefox DevTools extension for intercepting, decoding, and inspecting **MessagePack (msgpack)** network responses.
 
 Built with **Manifest V3**, **React 19**, **TypeScript**, **Vite 8**, and **Tailwind CSS 4**.
 
 ## Features
 
-- Intercepts finished network requests via `chrome.devtools.network.onRequestFinished`
+- Intercepts finished network requests via the DevTools `network.onRequestFinished` API
+- **Cross-browser:** ships Chrome and Firefox (WebExtensions) builds from one codebase
 - Filters responses by Content-Type (`application/x-msgpack`, `application/msgpack`, `application/vnd.msgpack`, plus **custom configurable types**)
 - Decodes binary MessagePack bodies (`base64` → `Uint8Array` → `msgpack.decode`)
 - Two-column layout: request list on the left, decoded JSON on the right
@@ -21,7 +22,7 @@ Built with **Manifest V3**, **React 19**, **TypeScript**, **Vite 8**, and **Tail
 
 - Node.js (any recent LTS release)
 - npm
-- Chrome / Chromium (for loading the unpacked extension)
+- Chrome / Chromium **or** Firefox (for loading the unpacked extension)
 
 ## Installation
 
@@ -31,23 +32,25 @@ npm install
 
 ## Build
 
+Build for a specific browser:
+
 ```bash
-npm run build
+npm run build:chrome    # output: dist/
+npm run build:firefox   # output: dist-firefox/
 ```
 
-The production build is written to the `dist/` directory:
+`npm run build` is an alias for `npm run build:chrome`. Each target emits the
+matching manifest from the `manifests/` directory into its output folder:
 
 ```
-dist/
-├── manifest.json
-├── devtools.html
-├── devtools.js
-├── panel.html
-├── panel.js
-├── assets/
-│   └── panel.css
-└── chunks/
-    └── ...
+dist/                       dist-firefox/
+├── manifest.json           ├── manifest.json
+├── devtools.html           ├── devtools.html
+├── devtools.js             ├── devtools.js
+├── panel.html              ├── panel.html
+├── panel.js                ├── panel.js
+├── assets/                 ├── assets/
+└── chunks/                 └── chunks/
 ```
 
 ## Load the Extension in Chrome
@@ -58,10 +61,21 @@ dist/
 4. Select the `dist/` folder of this project.
 5. The **MessagePack DevTools** extension should now appear in your list.
 
+## Load the Extension in Firefox
+
+1. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on…**.
+3. Select the `manifest.json` file inside the `dist-firefox/` folder.
+4. The **MessagePack DevTools** extension should now appear in the list.
+
+> Temporary add-ons are removed when Firefox restarts. For a permanent install,
+> produce a signed build with `web-ext sign` (see the release workflow) or submit
+> the packaged `dist-firefox/` folder to [addons.mozilla.org](https://addons.mozilla.org).
+
 ## How to Use
 
 1. Open any website in a tab (or reload an existing tab).
-2. Open Chrome DevTools (`F12` or `Ctrl+Shift+I` / `Cmd+Option+I`).
+2. Open the browser DevTools (`F12` or `Ctrl+Shift+I` / `Cmd+Option+I`).
 3. Click the **MsgPack** tab at the top of DevTools.
 4. Trigger requests that return MessagePack responses.
 5. Captured requests appear in the left column. Each row shows the status code,
@@ -74,17 +88,24 @@ dist/
 ### Notes
 
 - Captures survive DevTools panel reloads within the same browser session
-  (stored via `chrome.storage.session`, max 200 entries).
+  (stored via the `storage.session` API, max 200 entries).
 - The extension must be reloaded after rebuilding if you have already loaded
-  it as an unpacked extension. On `chrome://extensions`, click the refresh icon
-  on the extension card.
+  it as an unpacked extension. In Chrome, click the refresh icon on the
+  extension card; in Firefox, reload the temporary add-on.
 - If a response cannot be decoded, the request is still captured and an error
   is shown in the detail panel.
+- **Firefox limitations:** the DevTools APIs differ slightly between engines.
+  Firefox's `getContent()` returns a `(content, mimeType)` pair (rather than
+  Chrome's `(content, encoding)`), and it base64-encodes non-text bodies — the
+  extension normalizes both so decoding works the same. DevTools extensions are
+  desktop-only; Firefox for Android is not supported.
 
 ## Development
 
 ```bash
 npm run dev           # Vite dev server
+npm run build:chrome  # Production build for Chrome (dist/)
+npm run build:firefox # Production build for Firefox (dist-firefox/)
 npm run typecheck     # TypeScript type check (no emit)
 npm run lint          # ESLint
 npm run lint:fix      # ESLint with autofix
@@ -97,22 +118,26 @@ npm run test:watch    # Vitest watch mode
 ## Continuous Integration
 
 Every push and pull request to `main` runs **GitHub Actions**
-(`.github/workflows/ci.yml`): lint → format check → typecheck → test → build,
-on a matrix of **Node 22 and 24**. The built extension is uploaded as a workflow
-artifact (`msgpack-devtools-dist`), so you can download and load it without
-building locally.
+(`.github/workflows/ci.yml`): lint → format check → typecheck → test, then builds
+both the Chrome (`dist/`) and Firefox (`dist-firefox/`) bundles and validates the
+Firefox bundle with `web-ext lint`. The matrix covers **Node 22 and 24**. Both
+built extensions are uploaded as workflow artifacts
+(`msgpack-devtools-chrome`, `msgpack-devtools-firefox`), so you can download and
+load them without building locally.
 
 ### Release
 
 Pushing a version tag (e.g. `git tag v0.1.0 && git push origin v0.1.0`) runs
 `.github/workflows/release.yml`: it re-runs the full verification suite, builds
-the extension, packages `dist/` into a `.zip`, and creates a GitHub Release with
-the archive attached.
+both targets, packages each into a `.zip`, and creates a GitHub Release with both
+archives attached.
 
 If the Chrome Web Store secrets (`CWS_EXTENSION_ID`, `CWS_CLIENT_ID`,
-`CWS_CLIENT_SECRET`, `CWS_REFRESH_TOKEN`) are configured, the same workflow also
-uploads and auto-publishes the release to the Chrome Web Store. When the secrets
-are absent, the publish step is skipped.
+`CWS_CLIENT_SECRET`, `CWS_REFRESH_TOKEN`) are configured, the workflow also
+uploads and auto-publishes the Chrome bundle to the Chrome Web Store. If the
+addons.mozilla.org secrets (`AMO_JWT_ISSUER`, `AMO_JWT_SECRET`) are configured,
+it signs and submits the Firefox bundle via `web-ext sign`. Each publish step is
+skipped when its secrets are absent.
 
 ### Security
 
@@ -125,10 +150,11 @@ are absent, the publish step is skipped.
 
 ```
 msg-devtool/
-├── public/
-│   └── manifest.json          # Manifest V3 config
+├── manifests/
+│   ├── chrome.json            # Chrome Manifest V3 config
+│   └── firefox.json           # Firefox Manifest V3 config (+ gecko settings)
 ├── src/
-│   ├── devtools.ts            # Creates the DevTools panel
+│   ├── devtools.ts            # Creates the DevTools panel (cross-browser)
 │   ├── panel.tsx              # React entry point
 │   ├── index.css              # Tailwind CSS v4 entry
 │   ├── components/
@@ -139,6 +165,7 @@ msg-devtool/
 │   ├── hooks/
 │   │   └── useCaptures.ts     # Network listener + capture state
 │   └── lib/
+│       ├── browser.ts         # Cross-browser API shim (Chrome / Firefox)
 │       ├── decode.ts          # base64/bytes/msgpack pipeline (unit-tested)
 │       ├── filter.ts          # URL/method/status filter (unit-tested)
 │       ├── settings.ts        # Custom Content-Type persistence
@@ -147,12 +174,12 @@ msg-devtool/
 ├── .github/
 │   ├── dependabot.yml         # Weekly dependency update PRs
 │   └── workflows/
-│       ├── ci.yml             # CI: lint, typecheck, test, build (matrix)
+│       ├── ci.yml             # CI: lint, typecheck, test, build both targets
 │       ├── codeql.yml         # CodeQL security analysis
-│       └── release.yml        # Tag-triggered release + CWS publish
+│       └── release.yml        # Tag-triggered release + CWS/AMO publish
 ├── devtools.html              # DevTools page entry point
 ├── panel.html                 # Panel page entry point
-├── vite.config.ts             # Multi-entry build + vitest config
+├── vite.config.ts             # Multi-entry build + per-target manifest + vitest
 ├── eslint.config.js           # Flat ESLint config
 ├── tsconfig.json
 └── package.json

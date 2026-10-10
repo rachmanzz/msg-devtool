@@ -28,18 +28,23 @@ jobs:
           npm run typecheck
           npm test
 
-      - name: Build
-        run: npm run build
+      - name: Build (Chrome)
+        run: npm run build:chrome
 
-      - name: Package extension
+      - name: Build (Firefox)
+        run: npm run build:firefox
+
+      - name: Package extensions
         run: |
-          cd dist
-          zip -r "../msgpack-devtools-${{ github.ref_name }}.zip" .
+          (cd dist && zip -r "../msgpack-devtools-chrome-${{ github.ref_name }}.zip" .)
+          (cd dist-firefox && zip -r "../msgpack-devtools-firefox-${{ github.ref_name }}.zip" .)
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: msgpack-devtools-${{ github.ref_name }}.zip
+          files: |
+            msgpack-devtools-chrome-${{ github.ref_name }}.zip
+            msgpack-devtools-firefox-${{ github.ref_name }}.zip
           generate_release_notes: true
 
       # Publishes to the Chrome Web Store. Requires the repository secrets
@@ -65,9 +70,36 @@ jobs:
           CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
         run: |
           npx --yes chrome-webstore-upload-cli@4 upload \
-            --source "msgpack-devtools-${{ github.ref_name }}.zip" \
+            --source "msgpack-devtools-chrome-${{ github.ref_name }}.zip" \
             --extension-id "$CWS_EXTENSION_ID" \
             --client-id "$CWS_CLIENT_ID" \
             --client-secret "$CWS_CLIENT_SECRET" \
             --refresh-token "$CWS_REFRESH_TOKEN" \
             --auto-publish
+
+      # Signs and submits the Firefox package to addons.mozilla.org. Requires the
+      # repository secrets AMO_JWT_ISSUER and AMO_JWT_SECRET (from AMO API keys).
+      # The step is skipped when those secrets are not configured.
+      - name: Check for AMO credentials
+        id: amo
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+        run: |
+          if [ -n "$AMO_JWT_ISSUER" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to addons.mozilla.org
+        if: steps.amo.outputs.enabled == 'true'
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          npx --yes web-ext@latest sign \
+            --source-dir dist-firefox \
+            --artifacts-dir web-ext-artifacts \
+            --channel listed \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET"
