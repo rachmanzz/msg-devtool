@@ -155,6 +155,8 @@ msg-devtool/
 ├── manifests/
 │   ├── chrome.json            # Chrome Manifest V3 config
 │   └── firefox.json           # Firefox Manifest V3 config (+ gecko settings)
+├── public/
+│   └── icons/                 # Extension icons (16–128px, copied by Vite)
 ├── src/
 │   ├── devtools.ts            # Creates the DevTools panel (cross-browser)
 │   ├── panel.tsx              # React entry point
