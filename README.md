@@ -186,6 +186,8 @@ msg-devtool/
 ├── vite.config.ts             # Multi-entry build + per-target manifest + vitest
 ├── eslint.config.js           # Flat ESLint config
 ├── tsconfig.json
+├── PRIVACY.md                 # Privacy policy (source)
+├── docs/                      # GitHub Pages site (privacy policy)
 └── package.json
 ```
 
@@ -204,6 +206,13 @@ msg-devtool/
 | `vitest`               | Unit tests                       |
 | `eslint` / `prettier`  | Linting and formatting           |
 | `@types/chrome`        | Chrome API TypeScript types      |
+
+## Privacy
+
+MessagePack DevTools runs entirely on your device. It does **not** collect,
+transmit, sell, or share your data. Anything it reads stays in your browser and
+is cleared when the session ends. See [PRIVACY.md](PRIVACY.md) or the hosted
+policy at <https://rachmanzz.github.io/msg-devtool/privacy/>.
 
 ## License
 

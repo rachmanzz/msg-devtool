@@ -1,7 +1,7 @@
 # Chrome Web Store listing — MessagePack DevTools
 
 Ready-to-paste content for the Chrome Web Store developer dashboard.
-Everything here matches `manifests/chrome.json` (v0.1.0).
+Everything here matches `manifests/chrome.json` (v0.1.1).
 
 ## Store listing
 
@@ -93,7 +93,9 @@ The dashboard requires at least one real screenshot. Capture them locally:
   (personally identifiable info, health, financial, authentication,
   personal communications, location, web history, user activity, website
   content).
-- **Privacy policy URL**: not required, since no data is collected.
+- **Privacy policy URL**: not required since no data is collected, but one is
+  provided anyway:
+  `https://rachmanzz.github.io/msg-devtool/privacy/`
 - **Remote code**: No. The extension ships all of its code in the package and
   does not fetch or evaluate remote code.
 

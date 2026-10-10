@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy — MessagePack DevTools</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f1115;
+        --panel: #171a21;
+        --text: #e6e8eb;
+        --muted: #9aa3af;
+        --accent: #7c9cff;
+        --border: #262b36;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          16px/1.65 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+      }
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 56px 24px 96px;
+      }
+      h1 {
+        font-size: 1.9rem;
+        margin: 0 0 4px;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 40px 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+      .updated {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin: 0 0 8px;
+      }
+      p {
+        margin: 12px 0;
+      }
+      ul {
+        margin: 12px 0;
+        padding-left: 22px;
+      }
+      li {
+        margin: 6px 0;
+      }
+      code {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 5px;
+        padding: 1px 6px;
+        font-size: 0.9em;
+      }
+      a {
+        color: var(--accent);
+      }
+      .lead {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 4px 20px;
+        margin-top: 24px;
+      }
+      footer {
+        margin-top: 56px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Privacy Policy — MessagePack DevTools</h1>
+      <p class="updated">Last updated: October 10, 2026</p>
+
+      <p>
+        MessagePack DevTools is a developer tool that decodes and displays MessagePack
+        (msgpack) network responses inside a Chrome DevTools panel. It is designed to run
+        entirely on your device.
+      </p>
+
+      <div class="lead">
+        <ul>
+          <li>Does <strong>not</strong> collect, transmit, sell, or share your data.</li>
+          <li>No servers, no analytics, no telemetry, no third-party services.</li>
+          <li>
+            Anything it reads stays in your browser and is cleared when the browser
+            session ends.
+          </li>
+        </ul>
+      </div>
+
+      <h2>What the extension accesses and why</h2>
+      <ul>
+        <li>
+          <strong>Network responses of the tab you inspect.</strong> While the Chrome
+          DevTools window is open and the "MsgPack" panel is active, the extension reads
+          the network responses of the inspected page (URL, method, status, timing,
+          headers, body) using the Chrome DevTools Network API, so it can detect and
+          decode MessagePack payloads and display them as JSON.
+        </li>
+        <li>
+          <strong>Local session storage.</strong> Decoded results and request metadata are
+          kept only in the browser's <code>chrome.storage.session</code> (up to 200
+          entries) so the panel can restore them when DevTools is reopened during the same
+          browser session. This data is cleared when the browser session ends.
+        </li>
+      </ul>
+
+      <h2>What the extension does NOT do</h2>
+      <ul>
+        <li>It does not transmit any data off your device.</li>
+        <li>It does not sell or share data with anyone.</li>
+        <li>
+          It does not read your browsing history, cookies, bookmarks, passwords, or any
+          other browser data.
+        </li>
+        <li>It requests no host permissions and injects no content scripts.</li>
+      </ul>
+
+      <h2>Data retention and control</h2>
+      <p>
+        Captured data lives only in memory / session storage and is removed when the
+        browser session ends or when you click <strong>Clear</strong>.
+      </p>
+
+      <h2>Limited Use</h2>
+      <p>
+        MessagePack DevTools' use of information complies with the Chrome Web Store User
+        Data Policy, including the Limited Use requirements.
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        If this policy changes, the updated version will be posted at this URL with a new
+        "Last updated" date.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        For questions about this policy, open an issue at
+        <a href="https://github.com/rachmanzz/msg-devtool/issues"
+          >github.com/rachmanzz/msg-devtool/issues</a
+        >.
+      </p>
+
+      <footer>
+        <a href="../">MessagePack DevTools</a> ·
+        <a href="https://github.com/rachmanzz/msg-devtool">Source</a>
+      </footer>
+    </main>
+  </body>
+</html>
