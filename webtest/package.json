@@ -1,0 +1,10 @@
+{
+  "name": "msg-devtool-webtest",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Zero-dependency MessagePack demo server for testing/screenshotting the MessagePack DevTools extension.",
+  "scripts": {
+    "start": "node server.mjs"
+  }
+}

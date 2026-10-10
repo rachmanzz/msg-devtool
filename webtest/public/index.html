@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acme Store API — MessagePack demo</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">MP</span>
+        <div>
+          <h1>Acme Store API</h1>
+          <p>MessagePack responses demo — open DevTools → <strong>MsgPack</strong></p>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="fire-all" class="primary">Fire all requests</button>
+        <button id="clear">Clear</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <h2>Endpoints</h2>
+        <div id="endpoints" class="endpoints"></div>
+        <p class="hint">
+          Responses are MessagePack (<code>application/x-msgpack</code>) and decoded live
+          in the page.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Request log</h2>
+        <ul id="log" class="log"></ul>
+      </section>
+
+      <section class="panel viewer">
+        <div class="viewer-head">
+          <h2>Response</h2>
+          <span id="meta" class="meta">No request yet</span>
+        </div>
+        <pre id="output">
+{
+  "hint": "Click an endpoint to fetch a MessagePack response."
+}</pre>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
